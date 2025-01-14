@@ -30,15 +30,11 @@ jobs:
           pip install -r requirements.txt
 
       # 4. Selenium için gerekli tarayıcı sürücüsünü kur
-      - name: Setup Selenium WebDriver
+      - name: Install Chrome dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip
-          sudo rm -f /usr/local/bin/chromedriver
-          CHROMEDRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_131)
-          wget https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip -d /usr/local/bin
-          rm chromedriver_linux64.zip
+          sudo apt-get install -y unzip xvfb libxi6 libgconf-2-4
+          sudo apt-get --only-upgrade install google-chrome-stable
 
       # 5. Allure CLI'yi indir ve kur
       - name: Install Allure CLI
