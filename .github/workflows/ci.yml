@@ -34,7 +34,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get upgrade
-          wget https://dl.google.com/linux/direct/google-chrome-stable_131.0.6778.204-1_amd64.deb
+          wget https://dl.google.com/linux/direct/google-chrome-stable_132.0.6834.83_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb
 
       # 5. Allure CLI'yi indir ve kur
