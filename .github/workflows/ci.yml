@@ -5,6 +5,8 @@ on:
     branches:
       - main
   pull_request:
+    branches:
+      - master
 
 jobs:
   test:
@@ -61,8 +63,8 @@ jobs:
       # 9. raporu gh-pages branch'ine push ederek GitHub Pages üzerinden yayınla
       - name: Deploy Allure Report to GitHub Pages
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name "furkantatlisu"
+          git config --global user.email "furkantatlisu@gmail.com"
           git fetch --depth=1 origin gh-pages || git checkout --orphan gh-pages
           git reset --hard
           cp -r allure-report/* .
