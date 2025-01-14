@@ -47,7 +47,7 @@ jobs:
 
       # 6. Behave testlerini çalıştır
       - name: Run Behave Tests
-        run: behave --tags=@allure --format allure_behave.formatter:AllureFormatter --outfile=allure-results
+        run: behave --tags=@register --format allure_behave.formatter:AllureFormatter --outfile=allure-results
 
       # 7. Allure raporlarını oluştur
       - name: Generate Allure Report
