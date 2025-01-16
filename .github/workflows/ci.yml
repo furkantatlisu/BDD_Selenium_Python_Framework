@@ -33,8 +33,9 @@ jobs:
       - name: Install Chrome dependencies
         run: |
           sudo apt-get update
-          wget https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_126.0.2592.102-1_amd64.deb      
-          sudo apt install ./microsoft-edge-stable_126.0.2592.102-1_amd64.deb
+          wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_131.0.6778.265-1_amd64.deb
+          apt-get install -y ./google-chrome-stable_${CHROME_VERSION}_amd64.deb
+          google-chrome --version
           
       # 5. Allure CLI'yi indir ve kur
       - name: Install Allure CLI
