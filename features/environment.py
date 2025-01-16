@@ -5,7 +5,7 @@ from selenium import webdriver
 from utilities import ConfigReader
 
 
-def before_scenario(context, driver):
+def before_scenario(context):
     browser_name = ConfigReader.read_configuration("basic info", "browser")
 
     if browser_name.__eq__("chrome"):
@@ -19,7 +19,7 @@ def before_scenario(context, driver):
     context.driver.get(ConfigReader.read_configuration("basic info", "url"))
 
 
-def after_scenario(context, driver):
+def after_scenario(context):
     context.driver.quit()
 
 
