@@ -35,7 +35,6 @@ jobs:
           sudo apt-get update
           wget https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_126.0.2592.102-1_amd64.deb      
           sudo apt install ./microsoft-edge-stable_126.0.2592.102-1_amd64.deb
-          microsoft-edge --version
           
       # 5. Allure CLI'yi indir ve kur
       - name: Install Allure CLI
