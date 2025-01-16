@@ -1,6 +1,7 @@
 import allure
 from allure_commons.types import AttachmentType
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 from utilities import ConfigReader
 
@@ -9,7 +10,11 @@ def before_scenario(context, scenario):
     browser_name = ConfigReader.read_configuration("basic info", "browser")
 
     if browser_name.__eq__("chrome"):
-        context.driver = webdriver.Chrome()
+        options = Options()
+        options.add_argument("--headless")  # Headless modda çalıştır
+        options.add_argument("--no-sandbox")  # Sandbox gereksinimini kaldır
+        options.add_argument("--disable-dev-shm-usage")  # Paylaşımlı bellek kullanımı devre dışı
+        context.driver = webdriver.Chrome(options=options)
     elif browser_name.__eq__("firefox"):
         context.driver = webdriver.Firefox()
     elif browser_name.__eq__("edge"):
@@ -21,7 +26,7 @@ def before_scenario(context, scenario):
 
 
 def after_scenario(context, scenario):
-    if context.driver:
+    if hasattr(context, "driver"):  # Eğer driver atanmışsa kapat
         context.driver.quit()
     print(f"Closed WebDriver for scenario: {scenario.name}")
 
