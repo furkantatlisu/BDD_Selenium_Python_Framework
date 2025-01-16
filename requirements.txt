@@ -4,7 +4,7 @@ allure-python-commons==2.9.45
 attrs==24.3.0
 behave==1.2.6
 certifi==2024.12.14
-cffi==1.71.0
+cffi==1.17.1
 configparser==4.0.2
 h11==0.14.0
 idna==3.10
