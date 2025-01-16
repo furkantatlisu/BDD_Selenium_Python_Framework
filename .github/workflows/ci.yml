@@ -33,7 +33,7 @@ jobs:
       - name: Install Chrome dependencies
         run: |
           sudo apt-get update
-          wget https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_142.251.179.190_amd64.deb
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb
           sudo apt --fix-broken install
 
