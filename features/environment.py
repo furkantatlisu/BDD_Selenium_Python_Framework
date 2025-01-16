@@ -5,7 +5,7 @@ from selenium import webdriver
 from utilities import ConfigReader
 
 
-def before_scenario(context, driver):
+def before_scenario(context, scenario):
     browser_name = ConfigReader.read_configuration("basic info", "browser")
 
     if browser_name.__eq__("chrome"):
@@ -17,10 +17,13 @@ def before_scenario(context, driver):
 
     context.driver.maximize_window()
     context.driver.get(ConfigReader.read_configuration("basic info", "url"))
+    print(f"Initialized WebDriver for scenario: {scenario.name}")
 
 
-def after_scenario(context, driver):
-    context.driver.quit()
+def after_scenario(context, scenario):
+    if context.driver:
+        context.driver.quit()
+    print(f"Closed WebDriver for scenario: {scenario.name}")
 
 
 def after_step(context, step):
