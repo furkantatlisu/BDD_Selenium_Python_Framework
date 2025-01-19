@@ -1,0 +1,75 @@
+name: Selenium Tests CI with Behave
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Kodu çek
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # 2. Python ortamını kur
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11.5"
+
+      # 3. Gerekli bağımlılıkları yükle
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Selenium için gerekli tarayıcı sürücüsünü kur
+      - name: Install Chrome dependencies
+        run: |
+          sudo apt-get update
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome-stable_current_amd64.deb
+          cd /usr/bin/
+          ls
+          
+      # 5. Allure CLI'yi indir ve kur
+      - name: Install Allure CLI
+        run: |
+          curl -o allure.tar.gz -L https://github.com/allure-framework/allure2/releases/download/2.21.0/allure-2.21.0.tgz
+          tar -xzf allure.tar.gz
+          sudo mv allure-2.21.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+
+      # 6. Behave testlerini çalıştır
+      - name: Run Behave Tests
+        run: behave -t @login -f allure_behave.formatter:AllureFormatter -o Reports/allure-results || true
+
+      # 7. Allure raporlarını oluştur
+      - name: Generate Allure Report
+        run: allure generate Reports/allure-results --clean -o Reports/allure-results
+
+      # 8. Allure raporlarını GitHub Actions artefaktı olarak yükle
+      - name: Upload Allure Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report
+          path: Reports/allure-results
+
+      # 9. raporu gh-pages branch'ine push ederek GitHub Pages üzerinden yayınla
+      - name: Deploy Allure Report to GitHub Pages
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git fetch --depth=1 origin gh-pages || git checkout --orphan gh-pages
+          git reset --hard
+          cp -r Reports/allure-results/* .
+          touch .nojekyll
+          git add .
+          git commit -m "Deploy Allure Report"
+          git push origin gh-pages --force
