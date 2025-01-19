@@ -6,10 +6,10 @@ on:
       - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
-  test:
+  setup:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,9 +35,7 @@ jobs:
           sudo apt-get update
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome-stable_current_amd64.deb
-          cd /usr/bin/
-          ls
-          
+
       # 5. Allure CLI'yi indir ve kur
       - name: Install Allure CLI
         run: |
@@ -45,31 +43,102 @@ jobs:
           tar -xzf allure.tar.gz
           sudo mv allure-2.21.0 /opt/allure
           sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+          rm -f allure.tar.gz # İndirilen Allure tar dosyasini kaldir
 
-      # 6. Behave testlerini çalıştır
-      - name: Run Behave Tests
-        run: behave -t @login -f allure_behave.formatter:AllureFormatter -o Reports/allure-results || true
+      - name: Create directories for Allure results and history
+        run: |
+          mkdir -p features/reports/allure-results/history
+          
+      # Step to retrieve previous Allure history from a branch
+      - name: Download Allure history from branch
+        run: |
+          git fetch origin history-branch
+          git checkout origin/history-branch -- features/reports/allure-results/history || echo "No previous history found"
+          
+      - name: Run Behave Tests and generate Allure results
+        run: |
+          mkdir -p features/reports/allure-results
+          behave --tags=@search -f allure_behave.formatter:AllureFormatter -o features/reports/allure-results || true
 
-      # 7. Allure raporlarını oluştur
+      - name: Merge previous Allure history
+        run: |
+          cp -R features/reports/allure-results/history/* features/reports/allure-results/ || echo "No previous history to merge"
       - name: Generate Allure Report
-        run: allure generate Reports/allure-results --clean -o Reports/allure-results
+        run: allure generate features/reports/allure-results/ -o features/allure-report --clean
 
-      # 8. Allure raporlarını GitHub Actions artefaktı olarak yükle
+      - name: Upload Allure HTML report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-html-report
+          path: features/allure-report/
+          retention-days: 5
+
+      - name: Handle untracked files (move to temp)
+        run: |
+          mkdir -p temp
+          mv features/allure-report/* temp/ || echo "No files to move" 
+
+      - name: Commit and push Allure history to branch
+        run: |
+          git config pull.rebase false
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
+
+      - name: Add all changes or stash untracked ones
+        run: |
+          # Add all changes or stash untracked ones
+          git add --all || git stash
+
+      - name: Fetch the latest history branch
+        run: |          
+          # Fetch the latest history branch
+          git fetch origin history-branch
+
+      - name: Checkout the history branch
+        run: |           
+          # Checkout the history branch
+          git checkout history-branch || git checkout -b history-branch
+      
+      - name: Pull changes and merge allowing unrelated histories
+        run: |
+          # Pull changes and merge allowing unrelated histories
+          git pull origin history-branch --no-edit --allow-unrelated-histories || echo "No changes to pull"
+          
+      - name: Add the directories to track history and reports
+        run: |
+          # Add the directories to track history and reports
+          git add features/reports/ features/allure-report/ features/reports/allure-results/
+          
+      - name: Commit the changes if any
+        run: |
+          # Commit the changes if any
+          git commit -m "Update Allure history and report" || echo "No changes to commit"
+      
+      - name: Push changes back to the branch with force to ensure sync
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          echo "*.deb" >> .gitignore
+          git push origin history-branch
+  test_execution:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+        # 8. Allure raporlarını GitHub Actions artefaktı olarak yükle
       - name: Upload Allure Report
         uses: actions/upload-artifact@v3
         with:
           name: allure-report
-          path: Reports/allure-results
+          path: features/allure-report
 
-      # 9. raporu gh-pages branch'ine push ederek GitHub Pages üzerinden yayınla
-      - name: Deploy Allure Report to GitHub Pages
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git fetch --depth=1 origin gh-pages || git checkout --orphan gh-pages
-          git reset --hard
-          cp -r Reports/allure-results/* .
-          touch .nojekyll
-          git add .
-          git commit -m "Deploy Allure Report" || echo "No changes to commit"
-          git push origin gh-pages --force
+      - name: Deploy Allure report to a separate branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./features/allure-report
+          publish_branch: main
+          force_orphan: true
