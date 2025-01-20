@@ -121,6 +121,7 @@ jobs:
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
           echo "*.deb" >> .gitignore
           git push origin history-branch
+          
   test_execution:
     runs-on: ubuntu-latest
     needs: setup
@@ -142,4 +143,3 @@ jobs:
           publish_dir: ./features/allure-report
           publish_branch: main
           force_orphan: true
-          
