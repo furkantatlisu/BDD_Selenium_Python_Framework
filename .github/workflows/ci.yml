@@ -133,7 +133,7 @@ jobs:
       - name: Upload Allure Report
         uses: actions/upload-artifact@v3
         with:
-          name: allure-report
+          name: allure-html-report
           path: features/allure-report
 
       - name: Deploy Allure report to a separate branch
