@@ -67,7 +67,7 @@ jobs:
         run: allure generate features/reports/allure-results/ -o features/allure-report --clean
 
       - name: Upload Allure HTML report as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: allure-html-report
           path: features/allure-report/
@@ -131,7 +131,7 @@ jobs:
 
         # 8. Allure raporlarını GitHub Actions artefaktı olarak yükle
       - name: Upload Allure Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: allure-html-report
           path: features/allure-report
