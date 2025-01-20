@@ -6,3 +6,4 @@
 *.pyc
 *.exe
 venv/*
+*.deb
