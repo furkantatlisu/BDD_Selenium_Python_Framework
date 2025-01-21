@@ -58,7 +58,7 @@ jobs:
       - name: Run Behave Tests and generate Allure results
         run: |
           mkdir -p features/reports/allure-results
-          behave --tags=@search -f allure_behave.formatter:AllureFormatter -o features/reports/allure-results || true
+          behave -f allure_behave.formatter:AllureFormatter -o features/reports/allure-results || true
 
       - name: Merge previous Allure history
         run: |
