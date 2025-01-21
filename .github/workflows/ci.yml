@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  setup:
+  environment_setup:
     runs-on: ubuntu-latest
 
     steps:
@@ -70,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: allure-html-report
-          path: features/allure-report/
+          path: features/allure-report
           retention-days: 5
 
       - name: Handle untracked files (move to temp)
@@ -124,14 +124,14 @@ jobs:
           
   test_execution:
     runs-on: ubuntu-latest
-    needs: setup
+    needs: environment_setup
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
         # 8. Allure raporlarını GitHub Actions artefaktı olarak yükle
-      - name: Upload Allure Report
-        uses: actions/upload-artifact@v3
+      - name: Download Allure Report
+        uses: actions/download-artifact@v3
         with:
           name: allure-html-report
           path: features/allure-report
@@ -140,6 +140,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: features/allure-report
-          publish_branch: gh-pages
+          publish_dir: ./features/allure-report
+          publish_branch: main
           force_orphan: true
