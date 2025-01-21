@@ -63,8 +63,10 @@ jobs:
       - name: Merge previous Allure history
         run: |
           cp -R features/reports/allure-results/history/* features/reports/allure-results/ || echo "No previous history to merge"
+
       - name: Generate Allure Report
-        run: allure generate features/reports/allure-results/ -o features/allure-report --clean
+        run: | 
+          allure generate features/reports/allure-results -o features/allure-report --clean
 
       - name: Upload Allure HTML report as artifact
         uses: actions/upload-artifact@v3
