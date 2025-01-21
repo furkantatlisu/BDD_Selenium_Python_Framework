@@ -142,6 +142,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./features/allure-report
+          publish_dir: features/allure-report
           publish_branch: gh-pages
           force_orphan: true
