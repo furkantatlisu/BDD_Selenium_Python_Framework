@@ -1,9 +1,12 @@
 name: Selenium Tests CI with Behave
 
 on:
-  schedule:
-    - cron: '0 * * * *' # Her saat başı çalıştırır
-  workflow_dispatch: # Manuel tetikleme desteği
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   environment_setup:
